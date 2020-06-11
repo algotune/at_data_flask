@@ -2,7 +2,7 @@ alabaster==0.7.12
 aniso8601==8.0.0
 appdirs==1.4.4
 appnope==0.1.0
-at-util @ git+git://github.com/algotune/at_util.git@cba0d40ea3dd6e6f5f408590aead522311ac9a49
+at-util @ git+git://github.com/algotune/at_util.git
 attrs==19.3.0
 Babel==2.8.0
 backcall==0.2.0
