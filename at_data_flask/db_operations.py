@@ -31,19 +31,26 @@ def db_get_fund_list(fund_type,
     :param active_only:
     :return:
     usage:
+    >>> fund_type = 'hedge'
+    >>> order_by = 'sharpe_ratio'
+    >>> order_type = 'asc'
+    >>> page_number = 10
+    >>> page_size = 100
+    >>> active_only = True
     >>> db_get_fund_list('hedge', page_number=1)
     """
     assert fund_type in VALID_FUND_TYPE_TABLE.keys(), 'fund_type [{}] not supported'.format(fund_type)
     table_name = VALID_FUND_TYPE_TABLE[fund_type]
     if active_only:
-        sql = 'select * from eureka.{}_funddetails where dead = \'No\' ' \
-              'order by {} {} limit {} offset {}'.format(table_name, order_by, order_type,
-                                                         page_size, page_number * page_size)
+        sql = f'select * from eureka.{table_name}_funddetails where dead = \'No\' ' \
+              f'and {order_by} is not null and {order_by} <> \'n/a\' ' \
+              f'order by {order_by} {order_type} limit {page_size} offset {page_number * page_size}'
     else:
-        sql = 'select * from eureka.{}_funddetails ' \
-              'order by {} {} limit {} offset {}'.format(table_name, order_by, order_type,
-                                                         page_size, page_number * page_size)
+        sql = f'select * from eureka.{table_name}_funddetails ' \
+              f'order by {order_by} {order_type} limit {page_size} offset {page_number * page_size}'
+
     result = db_select(db_session, sql)
+
     return result
 
 

@@ -16,6 +16,7 @@ def get_fund_by_id(fund_type: str, fund_id: str):
     result_dict = {}
     try:
         result = db_get_fund_by_id(fund_type, fund_id)
+        result = result.where(pd.notnull(result), None)
         if len(result) == 1:
             result_dict = result.iloc[0, :].to_dict()
     except Exception as e:
@@ -27,6 +28,8 @@ def get_fund_by_id(fund_type: str, fund_id: str):
 @app.route('/fund/ts/<fund_type>/<fund_id>', methods=['GET'])
 def get_fund_nav_ts_by_id(fund_type: str, fund_id: str):
     ts_df = db_get_fund_nav_ts_by_id(fund_type, fund_id)
+    ts_df = ts_df.where(pd.notnull(ts_df), None)
+
     # only return aum/return/date to reduce size of the json
     result_list = [x[1].to_dict() for x in ts_df[['aum', 'return', 'date']].iterrows()]
 
