@@ -45,12 +45,17 @@ def get_funds(fund_type: str):
     sort_order = request.args.get('sortOrder', 'asc')
     active_only = request.args.get('activeOnly', True, bool)
 
+    filter_str = request.args.get('filterStr', None, str)
+    if filter_str == 'null':
+        filter_str = None
+
     result_df = db_get_fund_list(fund_type=fund_type,
                                  order_by=sort_by,
                                  order_type=sort_order,
                                  page_number=page_num,
                                  page_size=page_size,
-                                 active_only=active_only)
+                                 active_only=active_only,
+                                 filter_str=filter_str)
     result_df = result_df.where(pd.notnull(result_df), None)
     result_list = [x[1].to_dict() for x in result_df.iterrows()]
     return jsonify(result_list)

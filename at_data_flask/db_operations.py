@@ -20,9 +20,11 @@ def db_get_fund_list(fund_type,
                      order_type='asc',
                      page_number=0,
                      page_size=100,
-                     active_only=True):
+                     active_only=True,
+                     filter_str=None):
     """
 
+    :param filter_str:
     :param fund_type:
     :param order_by:
     :param order_type:
@@ -41,14 +43,18 @@ def db_get_fund_list(fund_type,
     """
     assert fund_type in VALID_FUND_TYPE_TABLE.keys(), 'fund_type [{}] not supported'.format(fund_type)
     table_name = VALID_FUND_TYPE_TABLE[fund_type]
+    sql_select = f'select * from eureka.{table_name}_funddetails'
+    sql_where = f'where {order_by} is not null and {order_by} <> \'n/a\' '
     if active_only:
-        sql = f'select * from eureka.{table_name}_funddetails where dead = \'No\' ' \
-              f'and {order_by} is not null and {order_by} <> \'n/a\' ' \
-              f'order by {order_by} {order_type} limit {page_size} offset {page_number * page_size}'
-    else:
-        sql = f'select * from eureka.{table_name}_funddetails ' \
-              f'order by {order_by} {order_type} limit {page_size} offset {page_number * page_size}'
+        sql_where += 'and dead = \'No\' '
 
+    if filter_str is not None and filter_str != '':
+        search_columns = ['main_inv_strategy', 'fund_name']
+        sql_where += 'and (' + ' or '.join(['{} like \'%{}%\''.format(x, filter_str) for x in search_columns]) + ') '
+
+    sql_order_by = f'order by {order_by} {order_type} limit {page_size} offset {page_number * page_size}'
+    sql = '{} {} {}'.format(sql_select, sql_where, sql_order_by)
+    print(sql)
     result = db_select(db_session, sql)
 
     return result
